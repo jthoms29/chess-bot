@@ -97,6 +97,16 @@ fn is_white_turn(cur_state: &State) -> bool {
 }
 
 /*
+Check if coordinates would put piece out of bounds.
+- true: if in bounds
+- false: if out of bounds 
+ */
+fn in_bound(x:i8, y:i8) -> bool {
+    return (x >= 0 && x <= 7) && (y >= 0 && y <= 7);
+}
+
+
+/*
 Generate a list of legal moves that can be applied to the current state
  */
 fn generate_legal_moves(cur_state: &State) {
@@ -118,7 +128,7 @@ fn generate_legal_moves(cur_state: &State) {
 
         match value {
             '♜' | '♖' => {
-                println!("This a damn bishop");
+            
             },
 
             _ => println!("uh oh"),
