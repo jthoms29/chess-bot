@@ -4,9 +4,9 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct State {
     // Dict mapping white piece location to piece
-    white: HashMap<(i8, i8), char>,
+    white: HashMap<(u8, u8), char>,
     // Dict mapping black piece location to piece
-    black: HashMap<(i8, i8), char>,
+    black: HashMap<(u8, u8), char>,
     // Boolean dictating which side's turn it is
     white_turn: bool,
 }
@@ -101,15 +101,62 @@ Check if coordinates would put piece out of bounds.
 - true: if in bounds
 - false: if out of bounds 
  */
-fn in_bound(x:i8, y:i8) -> bool {
+fn in_bound(x:u8, y:u8) -> bool {
     return (x >= 0 && x <= 7) && (y >= 0 && y <= 7);
+}
+
+
+/* 
+Compute legal moves a rook piece at loc_x,loc_y can do. Adds them to the passed in legal_moves vector
+*/
+fn rook_legal_moves(loc_x:u8, loc_y:u8, cur_player:&HashMap<(u8, u8), char>, opp_player:&HashMap<(u8,u8), char>, legal_moves:&mut Vec<String>) {
+    //check upwards
+    for i in (0..=loc_y).rev() {
+        // if an upwards coordinate is blocked by own piece, must stop
+        if cur_player.contains_key(&(loc_x, i)) {break;}
+        legal_moves.push(format!("{loc_x}{loc_y} to {loc_x}{i}"));
+
+        //  if this location contains an opposing piece, must stop here
+        if opp_player.contains_key(&(loc_x, i)) {break;}
+    }
+
+    //check downwards
+    for i in (loc_y..=7) {
+        if cur_player.contains_key(&(loc_x, i)) {break;}
+        legal_moves.push(format!("{loc_x}{loc_y} to {loc_x}{i}"));
+
+        //  if this location contains an opposing piece, must stop here
+        if opp_player.contains_key(&(loc_x, i)) {break;}
+    }
+
+    //check left
+    for i in (0..=loc_x).rev() {
+        // if an upwards coordinate is blocked by own piece, must stop
+        if cur_player.contains_key(&(i, loc_y)) {break;}
+        legal_moves.push(format!("{loc_x}{loc_y} to {i}{loc_y}"));
+
+        //  if this location contains an opposing piece, must stop here
+        if opp_player.contains_key(&(i, loc_y)) {break;}
+    }
+
+    //check right
+    for i in loc_x..=7 {
+        // if an upwards coordinate is blocked by own piece, must stop
+        if cur_player.contains_key(&(i, loc_y)) {break;}
+        legal_moves.push(format!("{loc_x}{loc_y} to {i}{loc_y}"));
+
+        //  if this location contains an opposing piece, must stop here
+        if opp_player.contains_key(&(i, loc_y)) {break;}
+    }
 }
 
 
 /*
 Generate a list of legal moves that can be applied to the current state
  */
-fn generate_legal_moves(cur_state: &State) {
+fn generate_legal_moves(cur_state: &State) -> Vec<String> {
+
+    let mut legal_moves: Vec<String> = Vec::new();
 
     /* Get the piece positions for the current player and the opposing player */
     let cur_player = if is_white_turn(&cur_state) {
@@ -126,25 +173,28 @@ fn generate_legal_moves(cur_state: &State) {
 
     for (key, value) in cur_player {
 
-        match value {
-            '♜' | '♖' => {
-            
-            },
+        let loc_x = key.0;
+        let loc_y = key.1;
 
+        match value {
+            // could go to any straight line location from origin if not blocked by some other piece
+            '♜' | '♖' => {
+                rook_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
+            },
             _ => println!("uh oh"),
         }
-        println!("{},{} / {}", key.0, key.1, value)
-
     }
 
-
-
+        return legal_moves;
 }
+
+
 
 fn main() {
     let test1 = State::default_state();
     println!("{}", test1.to_string());
     println!("{}", is_white_turn(&test1));
 
-    generate_legal_moves(&test1);
+    let legal_moves = generate_legal_moves(&test1);
+
 }
