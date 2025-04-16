@@ -80,7 +80,7 @@ impl State {
         }
 
         new_state.white_turn = true;
-
+        //new_state.white_turn = false;
         return new_state;
 
     }
@@ -128,7 +128,7 @@ opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
     }
 
     // if first move, can move up/down twice
-    if loc_y == 6 &&
+    if (white_turn && loc_y == 6) || (!white_turn && loc_y == 1) &&
     !cur_player.contains_key(&(loc_x, loc_y+direction*2)) && 
     !opp_player.contains_key(&(loc_x, loc_y+direction*2)) {
         let new_y = loc_y+direction*2;
@@ -155,46 +155,95 @@ opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
 Compute legal moves a rook piece at loc_x,loc_y can do. Adds them to the passed in legal_moves vector
 */
 fn rook_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
-    //check upwards
-    for i in (0..=loc_y).rev() {
-        // if an upwards coordinate is blocked by own piece, must stop
-        if cur_player.contains_key(&(loc_x, i)) {break;}
-        legal_moves.push(format!("{loc_x},{loc_y} to {loc_x},{i}"));
 
-        //  if this location contains an opposing piece, must stop here
-        if opp_player.contains_key(&(loc_x, i)) {break;}
-    }
+    for i in 0..4 {
+        let new_x: i8 = loc_x;
+        let new_y: i8 = loc_y;
 
-    //check downwards
-    for i in loc_y..=7 {
-        if cur_player.contains_key(&(loc_x, i)) {break;}
-        legal_moves.push(format!("{loc_x},{loc_y} to {loc_x},{i}"));
+        let x_dir = match i {
+            // up/down
+            0 | 2 => 0,
+            // right
+            1 => 1,
+            //left
+            3 => -1,
+            _ => 0 //impossible to reach
+        };
 
-        //  if this location contains an opposing piece, must stop here
-        if opp_player.contains_key(&(loc_x, i)) {break;}
-    }
+        let y_dir = match i {
+            // up
+            0 => -1,
+            // left/right
+            1 | 3 => 0,
+            // down
+            2 => 1,
+            _ => 0 //impossible to reach
+        };
 
-    //check left
-    for i in (0..=loc_x).rev() {
-        // if an upwards coordinate is blocked by own piece, must stop
-        if cur_player.contains_key(&(i, loc_y)) {break;}
-        legal_moves.push(format!("{loc_x},{loc_y} to {i},{loc_y}"));
+        // check each space from the current direction
+        loop {
+            let new_x = new_x + x_dir;
+            let new_y = new_y + y_dir;
+            if in_bound(new_x, new_y) &&
+            !cur_player.contains_key(&(new_x, new_y)) {
+                legal_moves.push(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
 
-        //  if this location contains an opposing piece, must stop here
-        if opp_player.contains_key(&(i, loc_y)) {break;}
-    }
-
-    //check right
-    for i in loc_x..=7 {
-        // if an upwards coordinate is blocked by own piece, must stop
-        if cur_player.contains_key(&(i, loc_y)) {break;}
-        legal_moves.push(format!("{loc_x},{loc_y} to {i},{loc_y}"));
-
-        //  if this location contains an opposing piece, must stop here
-        if opp_player.contains_key(&(i, loc_y)) {break;}
+                // if an opposing player's piece is on this coordinate, we must stop here
+                if opp_player.contains_key(&(new_x, new_y)) { break; }
+            }
+            // no more valid moves possible
+            else {
+                break;
+            }
+        }
     }
 }
 
+
+
+fn bishop_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
+
+    // check the four diagonals. The changes to a coordinate for a given direction are decided by x_dir and y_dir
+    for i in 0..4 { 
+        let new_x: i8 = loc_x;
+        let new_y: i8 = loc_y;
+
+        let x_dir = match i {
+            //left
+            0 | 2 => -1,
+            //right
+            1 | 3 => 1,
+            _ => 0 //impossible to reach
+        };
+
+        let y_dir = match i {
+            //down
+            0 | 2 => 1,
+            //up
+            1 | 3 => -1,
+            _ => 0 //impossible to reach
+        };
+
+        // go through all spaces in the current diagonal until you can't anymore (piece or edge of board)
+        loop {
+            let new_x = new_x + x_dir;
+            let new_y = new_y + y_dir;
+
+            if in_bound(new_x, new_y) &&
+            !cur_player.contains_key(&(new_x, new_y)) {
+                legal_moves.push(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+
+                // if an opposing player's piece is on this coordinate, we must stop here
+                if opp_player.contains_key(&(new_x, new_y)) { break; }
+            }
+            // no more valid moves possible
+            else {
+                break;
+            }
+        }
+    }
+
+}
 
 /*
 Generate a list of legal moves that can be applied to the current state
@@ -225,6 +274,9 @@ fn generate_legal_moves(cur_state: &State) -> Vec<String> {
             // could go to any straight line location from origin if not blocked by some other piece
             '♜' | '♖' => {
                 rook_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
+            },
+            '♝' | '♗' => {
+                bishop_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
             },
             '♟' | '♙' => {
                 pawn_legal_moves(is_white_turn(&cur_state), loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
