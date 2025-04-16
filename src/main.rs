@@ -4,9 +4,9 @@ use std::collections::HashMap;
 #[derive(Default)]
 pub struct State {
     // Dict mapping white piece location to piece
-    white: HashMap<(u8, u8), char>,
+    white: HashMap<(i8, i8), char>,
     // Dict mapping black piece location to piece
-    black: HashMap<(u8, u8), char>,
+    black: HashMap<(i8, i8), char>,
     // Boolean dictating which side's turn it is
     white_turn: bool,
 }
@@ -27,12 +27,12 @@ impl State {
             for j in 0..8 {
                 
 
-                if self.white.contains_key(&(i,j)) {
-                    let piece: char = *self.white.get(&(i,j)).expect("Not in hashmap");
+                if self.white.contains_key(&(j,i)) {
+                    let piece: char = *self.white.get(&(j,i)).expect("Not in hashmap");
                     str_rep.push_str(&format!(" {} ", piece));
                 }
-                else if self.black.contains_key(&(i,j)) {
-                    let piece: char = *self.black.get(&(i,j)).expect("Not in hashmap");
+                else if self.black.contains_key(&(j,i)) {
+                    let piece: char = *self.black.get(&(j,i)).expect("Not in hashmap");
                     str_rep.push_str(&format!(" {} ", piece));
                 }
                 else {
@@ -53,30 +53,30 @@ impl State {
         let mut new_state: State = Default::default();
         new_state.black =  HashMap::from([
             ((0,0), '♜'),
-            ((0,1), '♞'),
-            ((0,2), '♝'),
-            ((0,3), '♛'),
-            ((0,4), '♚'),
-            ((0,5), '♝'),
-            ((0,6), '♞'),
-            ((0,7), '♜'),
+            ((1,0), '♞'),
+            ((2,0), '♝'),
+            ((3,0), '♛'),
+            ((4,0), '♚'),
+            ((5,0), '♝'),
+            ((6,0), '♞'),
+            ((7,0), '♜'),
         ]);
         for i in 0..8 {
-            new_state.black.insert((1, i), '♟');
+            new_state.black.insert((i, 1), '♟');
         }
 
         new_state.white = HashMap::from([
-            ((7,0), '♖'),
-            ((7,1), '♘'),
-            ((7,2), '♗'),
-            ((7,3), '♕'),
-            ((7,4), '♔'),
-            ((7,5), '♗'),
-            ((7,6), '♘'),
+            ((0,7), '♖'),
+            ((1,7), '♘'),
+            ((2,7), '♗'),
+            ((3,7), '♕'),
+            ((4,7), '♔'),
+            ((5,7), '♗'),
+            ((6,7), '♘'),
             ((7,7), '♖'),
         ]);
         for i in 0..8 {
-            new_state.white.insert((6, i), '♙');
+            new_state.white.insert((i, 6), '♙');
         }
 
         new_state.white_turn = true;
@@ -101,29 +101,74 @@ Check if coordinates would put piece out of bounds.
 - true: if in bounds
 - false: if out of bounds 
  */
-fn in_bound(x:u8, y:u8) -> bool {
+fn in_bound(x:i8, y:i8) -> bool {
     return (x >= 0 && x <= 7) && (y >= 0 && y <= 7);
+}
+
+
+
+/* 
+Compute legal moves a pawn piece at loc_x,loc_y can do. Adds them to the passed in legal_moves vector
+*/
+fn pawn_legal_moves(white_turn: bool, loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>,
+opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
+
+    // white pawns move up(-), black pawns move down(+)
+    let direction: i8 = match white_turn {
+        true => {-1 }
+        false => { 1 }
+    };
+
+    // check up/down 
+    if in_bound(loc_x, loc_y+direction) && 
+    !cur_player.contains_key(&(loc_x, loc_y+direction)) && 
+    !opp_player.contains_key(&(loc_x, loc_y+direction)) {
+        let new_y = loc_y+direction;
+        legal_moves.push(format!("{loc_x},{loc_y} to {loc_x},{new_y}"));
+    }
+
+    // if first move, can move up/down twice
+    if loc_y == 6 &&
+    !cur_player.contains_key(&(loc_x, loc_y+direction*2)) && 
+    !opp_player.contains_key(&(loc_x, loc_y+direction*2)) {
+        let new_y = loc_y+direction*2;
+        legal_moves.push(format!("{loc_x},{loc_y} to {loc_x},{new_y}"));
+    }
+
+    // check diagonals for opposite team pieces
+    // up/down-left
+    if opp_player.contains_key(&(loc_x-1, loc_y+direction)) {
+        let new_x = loc_x-1;
+        let new_y = loc_y+direction;
+        legal_moves.push(format!("{loc_x},{loc_y} to {new_x},{new_y}"))
+    }
+    // up/down-right
+    if opp_player.contains_key(&(loc_x+1, loc_y+direction)) {
+        let new_x = loc_x+1;
+        let new_y = loc_y+direction;
+        legal_moves.push(format!("{loc_x},{loc_y} to {new_x},{new_y}"))
+    }
 }
 
 
 /* 
 Compute legal moves a rook piece at loc_x,loc_y can do. Adds them to the passed in legal_moves vector
 */
-fn rook_legal_moves(loc_x:u8, loc_y:u8, cur_player:&HashMap<(u8, u8), char>, opp_player:&HashMap<(u8,u8), char>, legal_moves:&mut Vec<String>) {
+fn rook_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
     //check upwards
     for i in (0..=loc_y).rev() {
         // if an upwards coordinate is blocked by own piece, must stop
         if cur_player.contains_key(&(loc_x, i)) {break;}
-        legal_moves.push(format!("{loc_x}{loc_y} to {loc_x}{i}"));
+        legal_moves.push(format!("{loc_x},{loc_y} to {loc_x},{i}"));
 
         //  if this location contains an opposing piece, must stop here
         if opp_player.contains_key(&(loc_x, i)) {break;}
     }
 
     //check downwards
-    for i in (loc_y..=7) {
+    for i in loc_y..=7 {
         if cur_player.contains_key(&(loc_x, i)) {break;}
-        legal_moves.push(format!("{loc_x}{loc_y} to {loc_x}{i}"));
+        legal_moves.push(format!("{loc_x},{loc_y} to {loc_x},{i}"));
 
         //  if this location contains an opposing piece, must stop here
         if opp_player.contains_key(&(loc_x, i)) {break;}
@@ -133,7 +178,7 @@ fn rook_legal_moves(loc_x:u8, loc_y:u8, cur_player:&HashMap<(u8, u8), char>, opp
     for i in (0..=loc_x).rev() {
         // if an upwards coordinate is blocked by own piece, must stop
         if cur_player.contains_key(&(i, loc_y)) {break;}
-        legal_moves.push(format!("{loc_x}{loc_y} to {i}{loc_y}"));
+        legal_moves.push(format!("{loc_x},{loc_y} to {i},{loc_y}"));
 
         //  if this location contains an opposing piece, must stop here
         if opp_player.contains_key(&(i, loc_y)) {break;}
@@ -143,7 +188,7 @@ fn rook_legal_moves(loc_x:u8, loc_y:u8, cur_player:&HashMap<(u8, u8), char>, opp
     for i in loc_x..=7 {
         // if an upwards coordinate is blocked by own piece, must stop
         if cur_player.contains_key(&(i, loc_y)) {break;}
-        legal_moves.push(format!("{loc_x}{loc_y} to {i}{loc_y}"));
+        legal_moves.push(format!("{loc_x},{loc_y} to {i},{loc_y}"));
 
         //  if this location contains an opposing piece, must stop here
         if opp_player.contains_key(&(i, loc_y)) {break;}
@@ -181,7 +226,10 @@ fn generate_legal_moves(cur_state: &State) -> Vec<String> {
             '♜' | '♖' => {
                 rook_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
             },
-            _ => println!("uh oh"),
+            '♟' | '♙' => {
+                pawn_legal_moves(is_white_turn(&cur_state), loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
+            }
+            _ => print!("")
         }
     }
 
@@ -197,4 +245,7 @@ fn main() {
 
     let legal_moves = generate_legal_moves(&test1);
 
+    for s in &legal_moves {
+        println!("{s}");
+    }
 }
