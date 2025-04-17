@@ -246,7 +246,6 @@ fn bishop_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, o
 
 
 fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
-
     // check paths from all 8 directions
     for i in 0..8 {
         let new_x = loc_x;
@@ -295,6 +294,51 @@ fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, op
     }
 }
 
+
+/*
+Computes legal moves for king to take in the current state. Similar to queen function, but without looping - 1 move each direction
+ */
+fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
+    // check paths from all 8 directions
+    for i in 0..8 {
+        let new_x = loc_x;
+        let new_y = loc_y;
+
+        // direction from origin. Goes clockwise 0-7
+        let x_dir = match i {
+            // up/down
+            0 | 4 => 0,
+            // upright, right, downright
+            1 | 2 | 3 => 1,
+            // downleft, left, upleft
+            5 | 6 | 7 => -1,
+            //should never be reached
+            _ => 0
+        };
+
+        let y_dir = match i {
+            // right/left
+            2 | 6 => 0,
+            // up, upright, up-left
+            0 | 1 | 7 => -1,
+            // downright, down, downleft
+            3 | 4 | 5 => 1,
+            //should never be reached
+            _ => 0
+        };
+
+        // check if 1 space forward from current position is valid (in bound, no pieces from own side)
+        let new_x = new_x + x_dir;
+        let new_y = new_y + y_dir;
+
+        if in_bound(new_x, new_y) &&
+        !cur_player.contains_key(&(new_x, new_y)) {
+            legal_moves.push(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+        }
+
+    }
+}
+
 /*
 Generate a list of legal moves that can be applied to the current state
  */
@@ -322,6 +366,9 @@ fn generate_legal_moves(cur_state: &State) -> Vec<String> {
 
         // put all legal moves for current board state in legal_moves vector
         match value {
+            '♛' | '♕' => {
+                king_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
+            }
             '♚' | '♔' => {
                 queen_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
             },
