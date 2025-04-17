@@ -298,7 +298,7 @@ fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, op
 /*
 Computes legal moves for king to take in the current state. Similar to queen function, but without looping - 1 move each direction
  */
-fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut Vec<String>) {
+fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, legal_moves:&mut Vec<String>) {
     // check paths from all 8 directions
     for i in 0..8 {
         let new_x = loc_x;
@@ -340,6 +340,56 @@ fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp
 }
 
 /*
+Computes legal moves knight can take in this current state
+ */
+fn knight_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, legal_moves:&mut Vec<String>) {
+
+    // the night has 8 different possible landing points. This match looks confusing
+    // but trust me it gets them all. Combination of two spaces then one
+
+    for i in 0..8 {
+        let new_x = loc_x;
+        let new_y = loc_y;
+
+        // direction from origin. Goes clockwise 0-7
+        let x_dir = match i {
+            // short end goes left
+            0 | 5 => -1,
+            // short end goes right
+            1 | 4  => 1,
+            //long end goes left
+            6 | 7 => -2,
+            //long end goes right
+            2 | 3 => 2,
+            //should never be reached
+            _ => 0
+        };
+
+        let y_dir = match i {
+            // long end goes up
+            0 | 1 => -2,
+            // long end goes down
+            4 | 5 => 2,
+            // short end goes up
+            2 | 7 => -1,
+            // short end goes down
+            3 | 6 => 1,
+            //should never be reached
+            _ => 0
+        };
+
+        // check if landing position is valid (in bound, no pieces from own side)
+        let new_x = new_x + x_dir;
+        let new_y = new_y + y_dir;
+
+        if in_bound(new_x, new_y) &&
+        !cur_player.contains_key(&(new_x, new_y)) {
+            legal_moves.push(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+        }
+    }
+}
+
+/*
 Generate a list of legal moves that can be applied to the current state
  */
 fn generate_legal_moves(cur_state: &State) -> Vec<String> {
@@ -367,7 +417,7 @@ fn generate_legal_moves(cur_state: &State) -> Vec<String> {
         // put all legal moves for current board state in legal_moves vector
         match value {
             '♛' | '♕' => {
-                king_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
+                king_legal_moves(loc_x, loc_y, &cur_player, &mut legal_moves);
             }
             '♚' | '♔' => {
                 queen_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
@@ -378,6 +428,9 @@ fn generate_legal_moves(cur_state: &State) -> Vec<String> {
             '♝' | '♗' => {
                 bishop_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
             },
+            '♞' | '♘' => {
+                knight_legal_moves(loc_x, loc_y, &cur_player, &mut legal_moves);
+            }
             '♟' | '♙' => {
                 pawn_legal_moves(is_white_turn(&cur_state), loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
             }
