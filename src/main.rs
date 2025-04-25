@@ -17,9 +17,7 @@ impl State {
     Generate a string representation of the current state
      */
     fn to_string(&self) -> String {
-        let mut str_rep: String = String::from("");
-
-        str_rep.push_str("   A  B  C  D  E  F  G  H \n");
+        let mut str_rep: String = String::from("   A  B  C  D  E  F  G  H \n");
 
         for i in 0..8 {
             str_rep.push_str(&format!("{} ", i8::abs(i-8)));
@@ -442,6 +440,57 @@ fn generate_legal_moves(cur_state: &State) -> Vec<String> {
 }
 
 
+
+/*
+  Apply a legal action to the given state
+ */
+fn action_to_state(state: &mut State, action: &String) {
+
+    // all actions are strings of the form 'x,y to x,y'
+    let parts: Vec<&str> = action.split(" ").collect();
+
+    // get the starting and ending coordinates from the action
+    let start_pos: Vec<&str> = parts[0].split(",").collect();
+    let end_pos: Vec<&str> = parts[2].split(",").collect();
+
+    let start_x = start_pos[0].parse::<i8>().expect("error converting coordinate to int");
+    let start_y = start_pos[1].parse::<i8>().expect("error converting coordinate to int");
+
+    let end_x = end_pos[0].parse::<i8>().expect("error converting coordinate to int");
+    let end_y = end_pos[1].parse::<i8>().expect("error converting coordinate to int");
+
+
+    // get the current player's hashmap. Mutable borrow, so done in block
+    {
+        let cur_player: &mut HashMap<(i8, i8), char> = match state.white_turn {
+            true => { &mut state.white },
+            false => { &mut state.black },
+        };
+
+        // move piece from starting position to ending position
+        let piece: char = cur_player.remove(&(start_x, start_y)).expect("piece not in hashmap");
+        cur_player.insert((end_x, end_y), piece);
+    }
+
+    // second block, check if opposing player has piece in end_pos. Remove if so 
+    {
+        let opp_player: &mut HashMap<(i8, i8), char> = match state.white_turn {
+            false => { &mut state.white },
+            true => { &mut state.black },
+        };
+        //remove if possible
+        opp_player.remove(&(end_x, end_y));
+    }
+
+    // swap who's turn it is
+    state.white_turn = !state.white_turn;
+
+}
+
+
+fn estimate minimax(state: &State) {
+
+}
 
 fn main() {
     let test1 = State::default_state();
