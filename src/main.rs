@@ -1,5 +1,6 @@
 pub mod state;
 pub mod legal_moves;
+pub mod minimax;
 
 fn main() {
     let test1 = state::State::default_state();
