@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 use crate::legal_moves;
 
 #[derive(Default)]
@@ -19,11 +20,11 @@ impl State {
     Generate a string representation of the current state
     */
     pub fn to_string(&self) -> String {
-        let mut str_rep: String = String::from("   A  B  C  D  E  F  G  H \n");
-
+        //let mut str_rep: String = String::from("   A  B  C  D  E  F  G  H \n");
+        let mut str_rep: String = String::from("   0  1  2  3  4  5  6  7 \n");
         for i in 0..8 {
-            str_rep.push_str(&format!("{} ", i8::abs(i-8)));
-
+            //str_rep.push_str(&format!("{} ", i8::abs(i-8)));
+            str_rep.push_str(&format!("{} ", i));
             for j in 0..8 {
                 
 
@@ -50,10 +51,15 @@ impl State {
         return state.white_turn;
     }
 
+    /* Check if either player has won. Used in minimax search */
+    pub fn victory_check(state: &State) -> i8 {
+        return state.victory_flag;
+    }
+
     /*
     Create a default State struct. All pieces in default position
     */
-    pub fn default_state() -> Self {
+    pub fn new() -> Self {
 
         let mut new_state: State = Default::default();
         new_state.black =  HashMap::from([
@@ -95,16 +101,27 @@ impl State {
 
 // A set of separate functions that act on the state
 
+/*
+ Creates a copy of the passed in state
+ */
+pub fn copy_state(state: &State) -> State {
+    let mut new_state: State = State::new();
+    new_state.white = state.white.clone();
+    new_state.black = state.black.clone();
+    new_state.victory_flag = state.victory_flag;
+    new_state.white_turn = state.white_turn;
 
+    return new_state;
+}
 
 
 
 /*
 Generate a list of legal moves that can be applied to the current state
 */
-pub fn generate_legal_moves(cur_state: &State) -> Vec<String> {
+pub fn generate_legal_moves(cur_state: &State) -> HashSet<String> {
 
-    let mut legal_moves: Vec<String> = Vec::new();
+    let mut legal_moves: HashSet<String> = HashSet::new();
 
     /* Get the piece positions for the current player and the opposing player */
     let cur_player = if cur_state.white_turn {
