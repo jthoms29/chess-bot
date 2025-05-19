@@ -1,12 +1,13 @@
 
 use std::io;
 use std::collections::HashSet;
+use crate::state::{State};
 
 
 /*
  * Get an input from the player. This function ensures that the move the user gives as input is legal
  */
-pub fn get_player_input(legal_moves:&HashSet<String>) -> String {
+pub fn get_player_input(legal_moves: &HashSet<String>) -> String {
     let mut input = String::new();
 
     println!("Input a move:");
@@ -32,4 +33,23 @@ pub fn get_player_input(legal_moves:&HashSet<String>) -> String {
         }
     }
     return input;
+}
+
+pub fn player_turn(cur_state: &State) {
+
+}
+
+pub fn comp_turn(cur_state: &State) {
+
+}
+
+pub fn play_game() {
+    let mut input: String = String::new();
+    /* Create the initial state */
+    let init = State::new();
+
+    loop {
+        
+
+    }
 }
