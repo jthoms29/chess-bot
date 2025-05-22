@@ -96,6 +96,34 @@ impl State {
         return new_state;
 
     }
+
+    pub fn estimate_minimax(&self) -> i16 {
+        let mut minimax_val: i16 = 0;
+        for (&key, value) in &self.white {
+            match value {
+                '♕' => { minimax_val += 100},
+                '♔' => { minimax_val += 20 },
+                '♖' => { minimax_val += 15 },
+                '♗' => { minimax_val += 10 },
+                '♘' => { minimax_val += 7 },
+                '♙' => { minimax_val += 1 },
+                _   => { () }
+            }
+        }  
+        for (&key, value) in &self.black {
+            match value {
+                '♛' => { minimax_val -= 100},
+                '♚' => { minimax_val -= 20 },
+                '♜' => { minimax_val -= 15 },
+                '♝' => { minimax_val -= 10 },
+                '♞' => { minimax_val -= 7 },
+                '♟' => { minimax_val -= 1 },
+                _   => { () }
+            }
+        }  
+        return minimax_val;
+    }
+
 }
 
 
@@ -228,11 +256,5 @@ pub fn action_to_state(state: &mut State, action: &String) {
     // swap who's turn it is
     state.white_turn = !state.white_turn;
 
-}
-
-
-pub fn estimate_minimax(_state: &State) -> i16 {
-    /* TODO: implement this */
-    return 0;
 }
 
