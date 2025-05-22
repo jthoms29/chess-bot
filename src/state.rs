@@ -47,13 +47,13 @@ impl State {
 
 
     /* Returns whether or not it's white's turn */
-    pub fn is_white_turn(state: &State) -> bool {
-        return state.white_turn;
+    pub fn is_white_turn(&self) -> bool {
+        return self.white_turn;
     }
 
     /* Check if either player has won. Used in minimax search */
-    pub fn victory_check(state: &State) -> i8 {
-        return state.victory_flag;
+    pub fn victory_check(&self) -> i8 {
+        return self.victory_flag;
     }
 
     /*

@@ -33,7 +33,7 @@ pub fn search_min(cur_state: &State, depth_limit: u16) -> String {
     let mut best_action: String = String::new();
     let mut alpha: i16 = i16::MIN;
     let mut beta:i16 = i16::MAX;
-    let mut best: i16 = i16::MIN;
+    let mut best: i16 = i16::MAX;
 
     let mut cur_val: i16;
 
@@ -48,11 +48,13 @@ pub fn search_min(cur_state: &State, depth_limit: u16) -> String {
             best_action = action.clone();
         } 
     }
+    println!("got an action");
+    println!("{best_action}");
     return best_action;
 }
 
 
-fn max_recurse(cur_state: &State, alpha: i16, beta: i16, depth_limit: u16) -> i16 {
+fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16) -> i16 {
     if State::victory_check(&cur_state) == -1 {
         return -1000;
     }
@@ -76,12 +78,17 @@ fn max_recurse(cur_state: &State, alpha: i16, beta: i16, depth_limit: u16) -> i1
         if cur_val > best {
             best = cur_val;
         }
+        /* If min finds a lower value than the current best, we can continue */
+        if best >= beta {
+            return best;
+        }
+        alpha = std::cmp::max(alpha, best);
     }
     return best;
 }
 
 
-fn min_recurse(cur_state: &State, alpha: i16, beta: i16, depth_limit: u16) -> i16 {
+fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16) -> i16 {
     if State::victory_check(cur_state) == -1 {
         return -1000;
     }
@@ -106,6 +113,12 @@ fn min_recurse(cur_state: &State, alpha: i16, beta: i16, depth_limit: u16) -> i1
         if cur_val < best {
             best = cur_val
         }
+
+        /* If max finds a better value than the current best, we can continue */
+        if best <= alpha {
+            return best;
+        }
+        beta = std::cmp::min(best, beta);
     }
     return best;
 }

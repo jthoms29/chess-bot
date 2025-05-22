@@ -1,7 +1,7 @@
 
 use std::io;
 use std::collections::HashSet;
-use crate::state::{State};
+use crate::{legal_moves, state::{action_to_state, generate_legal_moves, State}, minimax::{search_min}};
 
 
 /*
@@ -35,21 +35,36 @@ pub fn get_player_input(legal_moves: &HashSet<String>) -> String {
     return input;
 }
 
-pub fn player_turn(cur_state: &State) {
+pub fn player_turn(cur_state: &State) -> String {
+    let mut input: String = String::new();
+    let legal_moves: HashSet<String> = generate_legal_moves(cur_state);
 
+    input = get_player_input(&legal_moves);
+    return input;
 }
 
-pub fn comp_turn(cur_state: &State) {
-
+pub fn comp_turn(cur_state: &State) -> String {
+    let mut input: String = String::new();
+    let input = search_min(&cur_state, 5);
+    return input;
 }
 
 pub fn play_game() {
-    let mut input: String = String::new();
     /* Create the initial state */
-    let init = State::new();
+    let mut state = State::new();
+    let mut action = String::new();
+    /* temporary. Player is always white */
+    let player = true;
 
     loop {
-        
-
+        if player == state.is_white_turn() {
+            println!("{}", state.to_string());
+            action = player_turn(&mut state);
+            action_to_state(&mut state, &action);
+        }
+        else {
+            action = comp_turn(&state);
+            action_to_state(&mut state, &action);
+        }
     }
 }
