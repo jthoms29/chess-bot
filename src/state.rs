@@ -99,7 +99,7 @@ impl State {
 
     pub fn estimate_minimax(&self) -> i16 {
         let mut minimax_val: i16 = 0;
-        for (&key, value) in &self.white {
+        for (&_key, value) in &self.white {
             match value {
                 '♕' => { minimax_val += 100},
                 '♔' => { minimax_val += 20 },
@@ -110,7 +110,7 @@ impl State {
                 _   => { () }
             }
         }  
-        for (&key, value) in &self.black {
+        for (&_key, value) in &self.black {
             match value {
                 '♛' => { minimax_val -= 100},
                 '♚' => { minimax_val -= 20 },

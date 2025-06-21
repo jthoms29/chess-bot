@@ -1,5 +1,5 @@
 use std::collections::HashSet;
-use crate::state::{self, action_to_state, copy_state, generate_legal_moves, State};
+use crate::state::{action_to_state, copy_state, generate_legal_moves, State};
 
 
 
@@ -7,8 +7,8 @@ use crate::state::{self, action_to_state, copy_state, generate_legal_moves, Stat
 /* Returns the best move that can be taken given a state and depth-limit */
 pub fn search_max(cur_state: &State, depth_limit: u16) -> String {
     let mut best_action: String = String::new();
-    let mut alpha: i16 = i16::MIN;
-    let mut beta:i16 = i16::MAX;
+    let alpha: i16 = i16::MIN;
+    let beta:i16 = i16::MAX;
     let mut best: i16 = i16::MIN;
 
     let mut cur_val: i16;
@@ -31,8 +31,8 @@ pub fn search_max(cur_state: &State, depth_limit: u16) -> String {
 /* Returns the best move that can be taken given a state and depth-limit */
 pub fn search_min(cur_state: &State, depth_limit: u16) -> String {
     let mut best_action: String = String::new();
-    let mut alpha: i16 = i16::MIN;
-    let mut beta:i16 = i16::MAX;
+    let alpha: i16 = i16::MIN;
+    let beta:i16 = i16::MAX;
     let mut best: i16 = i16::MAX;
 
     let mut cur_val: i16;
