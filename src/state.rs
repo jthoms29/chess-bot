@@ -26,7 +26,6 @@ impl State {
             //str_rep.push_str(&format!("{} ", i8::abs(i-8)));
             str_rep.push_str(&format!("{} ", i));
             for j in 0..8 {
-                
 
                 if self.white.contains_key(&(j,i)) {
                     let piece: char = *self.white.get(&(j,i)).expect("Not in hashmap");
@@ -40,8 +39,9 @@ impl State {
                     str_rep.push_str(" . ");
                 }
             }
-            str_rep.push_str("\n");
+            str_rep.push_str(&format!(" {}\n", i))
         }
+        str_rep.push_str("   0  1  2  3  4  5  6  7 \n");
     return str_rep;
     }
 
