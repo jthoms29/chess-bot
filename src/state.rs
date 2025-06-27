@@ -172,10 +172,10 @@ pub fn generate_legal_moves(cur_state: &State) -> HashSet<String> {
         // put all legal moves for current board state in legal_moves vector
         match value {
             '♛' | '♕' => {
-                legal_moves::king_legal_moves(loc_x, loc_y, &cur_player, &mut legal_moves);
+                legal_moves::queen_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
             }
             '♚' | '♔' => {
-                legal_moves::queen_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);
+                legal_moves::king_legal_moves(loc_x, loc_y, &cur_player, &mut legal_moves);
             },
             '♜' | '♖' => {
                 legal_moves::rook_legal_moves(loc_x, loc_y, &cur_player, &opp_player, &mut legal_moves);

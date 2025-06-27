@@ -55,15 +55,15 @@ pub fn search_min(cur_state: &State, depth_limit: u16) -> String {
 
 
 fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16) -> i16 {
-    if State::victory_check(&cur_state) == -1 {
+    if cur_state.victory_check() == -1 {
         return -1000;
     }
-    if State:: victory_check(&cur_state) == 1 {
+    if cur_state.victory_check() == 1 {
         return 1000;
     }
 
     if depth_limit == 0 {
-        return 0;
+        return cur_state.estimate_minimax();
     }
 
     let mut cur_val: i16;
@@ -89,15 +89,15 @@ fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16) -
 
 
 fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16) -> i16 {
-    if State::victory_check(cur_state) == -1 {
+    if cur_state.victory_check() == -1 {
         return -1000;
     }
-    if State:: victory_check(cur_state) == 1 {
+    if cur_state.victory_check() == 1 {
         return 1000;
     } 
 
     if depth_limit == 0 {
-        return 0;
+        return cur_state.estimate_minimax();
     }
 
     let mut cur_val: i16;
