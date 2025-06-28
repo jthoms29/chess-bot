@@ -5,15 +5,15 @@ use crate::state::{action_to_state, copy_state, generate_legal_moves, State};
 
 
 /* Returns the best move that can be taken given a state and depth-limit */
-pub fn search_max(cur_state: &State, depth_limit: u16) -> String {
-    let mut best_action: String = String::new();
+pub fn search_max(cur_state: &State, depth_limit: u16) -> [i8; 4] {
+    let mut best_action: [i8; 4] = [0; 4];
     let alpha: i16 = i16::MIN;
     let beta:i16 = i16::MAX;
     let mut best: i16 = i16::MIN;
 
     let mut cur_val: i16;
 
-    let legal_moves: HashSet<String> = generate_legal_moves(&cur_state);
+    let legal_moves: HashSet<[i8; 4]> = generate_legal_moves(&cur_state);
     for action in &legal_moves {
         let mut new_state = copy_state(&cur_state);
         action_to_state(&mut new_state, &action);
@@ -29,15 +29,15 @@ pub fn search_max(cur_state: &State, depth_limit: u16) -> String {
 
 
 /* Returns the best move that can be taken given a state and depth-limit */
-pub fn search_min(cur_state: &State, depth_limit: u16) -> String {
-    let mut best_action: String = String::new();
+pub fn search_min(cur_state: &State, depth_limit: u16) -> [i8; 4] {
+    let mut best_action: [i8; 4] = [0; 4];
     let alpha: i16 = i16::MIN;
     let beta:i16 = i16::MAX;
     let mut best: i16 = i16::MAX;
 
     let mut cur_val: i16;
 
-    let legal_moves: HashSet<String> = generate_legal_moves(&cur_state);
+    let legal_moves: HashSet<[i8; 4]> = generate_legal_moves(&cur_state);
     for action in &legal_moves {
         let mut new_state = copy_state(&cur_state);
         action_to_state(&mut new_state, &action);
@@ -48,8 +48,8 @@ pub fn search_min(cur_state: &State, depth_limit: u16) -> String {
             best_action = action.clone();
         } 
     }
-    println!("got an action");
-    println!("{best_action}");
+    //println!("got an action");
+    //println!("{best_action}");
     return best_action;
 }
 
@@ -69,7 +69,7 @@ fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16) -
     let mut cur_val: i16;
     let mut best: i16 = i16::MIN;
 
-    let legal_moves: HashSet<String> = generate_legal_moves(&cur_state);
+    let legal_moves: HashSet<[i8; 4]> = generate_legal_moves(&cur_state);
     for action in &legal_moves {
         let mut new_state = copy_state(&cur_state);
         action_to_state(&mut new_state, &action);
@@ -103,7 +103,7 @@ fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16) -
     let mut cur_val: i16;
     let mut best: i16 = i16::MAX;
 
-    let legal_moves: HashSet<String> = generate_legal_moves(&cur_state);
+    let legal_moves: HashSet<[i8; 4]> = generate_legal_moves(&cur_state);
 
     for action in &legal_moves {
         let mut new_state = copy_state(&cur_state);

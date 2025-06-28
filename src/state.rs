@@ -147,9 +147,9 @@ pub fn copy_state(state: &State) -> State {
 /*
 Generate a list of legal moves that can be applied to the current state
 */
-pub fn generate_legal_moves(cur_state: &State) -> HashSet<String> {
+pub fn generate_legal_moves(cur_state: &State) -> HashSet<[i8; 4]> {
 
-    let mut legal_moves: HashSet<String> = HashSet::new();
+    let mut legal_moves: HashSet<[i8; 4]> = HashSet::new();
 
     /* Get the piece positions for the current player and the opposing player */
     let cur_player = if cur_state.white_turn {
@@ -201,6 +201,7 @@ pub fn generate_legal_moves(cur_state: &State) -> HashSet<String> {
 /*
 Apply a legal action to the given state
 */
+/* 
 pub fn action_to_state(state: &mut State, action: &String) {
 
     // all actions are strings of the form 'x,y to x,y'
@@ -250,11 +251,61 @@ pub fn action_to_state(state: &mut State, action: &String) {
                 }
             }
             // wasn't a king, do nothing
-            none => (),
+            _ => (),
         }
     }
     // swap who's turn it is
     state.white_turn = !state.white_turn;
 
 }
+*/
 
+
+pub fn action_to_state(state: &mut State, action: &[i8; 4]) {
+
+    // get piece positions from action array
+    let start_x = action[0];
+    let start_y = action[1];
+    let end_x = action[2];
+    let end_y = action[3];
+
+    // get the current player's hashmap. Mutable borrow, so done in block
+    {
+        let cur_player: &mut HashMap<(i8, i8), char> = match state.white_turn {
+            true => { &mut state.white },
+            false => { &mut state.black },
+        };
+
+        // move piece from starting position to ending position
+        let piece: char = cur_player.remove(&(start_x, start_y)).expect("piece not in hashmap");
+        cur_player.insert((end_x, end_y), piece);
+    }
+
+    // second block, check if opposing player has piece in end_pos. Remove if so 
+    {
+        let opp_player: &mut HashMap<(i8, i8), char> = match state.white_turn {
+            false => { &mut state.white },
+            true => { &mut state.black },
+        };
+        //remove if possible
+        let opp_piece = opp_player.remove(&(end_x, end_y));
+        match opp_piece {
+            Some(x) => {
+                /* If a piece did exist at this spot, check if it was a king and set state's victory flag accordingly */
+                state.victory_flag = match x {
+                    // white has taken out opposing king
+                    '♛' => 1,
+                    // black has taken out opposing king
+                    '♕' => -1,
+                    // neither has taken out a king, victory flag remains unset
+                    _ => 0
+                }
+            }
+            // wasn't a king, do nothing
+            _ => (),
+        }
+    }
+    // swap who's turn it is
+    state.white_turn = !state.white_turn;
+
+}
