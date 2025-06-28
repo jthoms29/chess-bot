@@ -250,7 +250,7 @@ pub fn action_to_state(state: &mut State, action: &String) {
                 }
             }
             // wasn't a king, do nothing
-            None => (),
+            none => (),
         }
     }
     // swap who's turn it is
