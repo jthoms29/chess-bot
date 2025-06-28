@@ -14,7 +14,7 @@ pub fn in_bound(x:i8, y:i8) -> bool {
 Compute legal moves a pawn piece at loc_x,loc_y can do. Adds them to the passed in legal_moves vector
 */
 pub fn pawn_legal_moves(white_turn: bool, loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>,
-opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
+opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<[i8; 4]>) {
 
     // white pawns move up(-), black pawns move down(+)
     let direction: i8 = match white_turn {
@@ -27,7 +27,8 @@ opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
     !cur_player.contains_key(&(loc_x, loc_y+direction)) && 
     !opp_player.contains_key(&(loc_x, loc_y+direction)) {
         let new_y = loc_y+direction;
-        legal_moves.insert(format!("{loc_x},{loc_y} to {loc_x},{new_y}"));
+        //legal_moves.insert(format!("{loc_x},{loc_y} to {loc_x},{new_y}"));
+        legal_moves.insert([loc_x, loc_y, loc_x, new_y]);
     }
 
     // if first move, can move up/down twice
@@ -35,7 +36,8 @@ opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
     !cur_player.contains_key(&(loc_x, loc_y+direction*2)) && 
     !opp_player.contains_key(&(loc_x, loc_y+direction*2)) {
         let new_y = loc_y+direction*2;
-        legal_moves.insert(format!("{loc_x},{loc_y} to {loc_x},{new_y}"));
+        //legal_moves.insert(format!("{loc_x},{loc_y} to {loc_x},{new_y}"));
+        legal_moves.insert([loc_x, loc_y, loc_x, new_y]);
     }
 
     // check diagonals for opposite team pieces
@@ -43,13 +45,15 @@ opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
     if opp_player.contains_key(&(loc_x-1, loc_y+direction)) {
         let new_x = loc_x-1;
         let new_y = loc_y+direction;
-        legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+        //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+        legal_moves.insert([loc_x, loc_y, new_x, new_y]);
     }
     // up/down-right
     if opp_player.contains_key(&(loc_x+1, loc_y+direction)) {
         let new_x = loc_x+1;
         let new_y = loc_y+direction;
-        legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+        //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+        legal_moves.insert([loc_x, loc_y, new_x, new_y]);
     }
 }
 
@@ -57,7 +61,7 @@ opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
 /* 
 Compute legal moves a rook piece at loc_x,loc_y can do. Adds them to the passed in legal_moves vector
 */
-pub fn rook_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
+pub fn rook_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<[i8; 4]>) {
 
     for i in 0..4 {
         let mut new_x: i8 = loc_x;
@@ -89,7 +93,8 @@ pub fn rook_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>,
             new_y += y_dir;
             if in_bound(new_x, new_y) &&
             !cur_player.contains_key(&(new_x, new_y)) {
-                legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+                //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+                legal_moves.insert([loc_x, loc_y, new_x, new_y]);
 
                 // if an opposing player's piece is on this coordinate, we must stop here
                 if opp_player.contains_key(&(new_x, new_y)) { break; }
@@ -104,7 +109,7 @@ pub fn rook_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>,
 
 
 
-pub fn bishop_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
+pub fn bishop_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<[i8; 4]>) {
 
     // check the four diagonals. The changes to a coordinate for a given direction are decided by x_dir and y_dir
     for i in 0..4 { 
@@ -134,7 +139,8 @@ pub fn bishop_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char
 
             if in_bound(new_x, new_y) &&
             !cur_player.contains_key(&(new_x, new_y)) {
-                legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+                //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+                legal_moves.insert([loc_x, loc_y, new_x, new_y]);
 
                 // if an opposing player's piece is on this coordinate, we must stop here
                 if opp_player.contains_key(&(new_x, new_y)) { break; }
@@ -148,7 +154,7 @@ pub fn bishop_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char
 }
 
 
-pub fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<String>) {
+pub fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, opp_player:&HashMap<(i8,i8), char>, legal_moves:&mut HashSet<[i8; 4]>) {
     // check paths from all 8 directions
     for i in 0..8 {
         let mut new_x = loc_x;
@@ -183,7 +189,8 @@ pub fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>
 
             if in_bound(new_x, new_y) &&
             !cur_player.contains_key(&(new_x, new_y)) {
-                legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+                //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+                legal_moves.insert([loc_x, loc_y, new_y, new_y]);
                 // if an opposing player's piece is on this coordinate, we must stop here
                 if opp_player.contains_key(&(new_x, new_y)) { break; }
             }
@@ -199,7 +206,7 @@ pub fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>
 /*
 Computes legal moves for king to take in the current state. Similar to queen function, but without looping - 1 move each direction
 */
-pub fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, legal_moves:&mut HashSet<String>) {
+pub fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, legal_moves:&mut HashSet<[i8; 4]>) {
     // check paths from all 8 directions
     for i in 0..8 {
         let new_x = loc_x;
@@ -234,7 +241,8 @@ pub fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>,
 
         if in_bound(new_x, new_y) &&
         !cur_player.contains_key(&(new_x, new_y)) {
-            legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+            //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+            legal_moves.insert([loc_x, loc_y, new_x, new_y]);
         }
 
     }
@@ -243,7 +251,7 @@ pub fn king_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>,
 /*
 Computes legal moves knight can take in this current state
 */
-pub fn knight_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, legal_moves:&mut HashSet<String>) {
+pub fn knight_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, legal_moves:&mut HashSet<[i8; 4]>) {
 
     // the night has 8 different possible landing points. This match looks confusing
     // but trust me it gets them all. Combination of two spaces then one
@@ -285,7 +293,8 @@ pub fn knight_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char
 
         if in_bound(new_x, new_y) &&
         !cur_player.contains_key(&(new_x, new_y)) {
-            legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+            //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
+            legal_moves.insert([loc_x, loc_y, new_x, new_y]);
         }
     }
 }
