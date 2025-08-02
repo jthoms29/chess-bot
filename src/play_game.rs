@@ -53,7 +53,13 @@ pub fn translate_player_input(input: &String) -> Result<[i8; 4], ()> {
     let parts: Vec<&str> = input.split(" ").collect();
 
     // get the starting and ending coordinates from the action
-    let start_pos: Vec<&str> = parts[0].split(",").collect();
+    if let Some(start_pos) = match parts[0].split(",").collect() {
+        start_pos
+    }
+    else {
+        ["-1,-1"]
+    }
+
     let end_pos: Vec<&str> = parts[2].split(",").collect();
 
     let start_x = start_pos[0].parse::<i8>().expect("error converting coordinate to int");
