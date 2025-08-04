@@ -26,7 +26,13 @@ pub fn get_player_input(legal_moves: &HashSet<[i8; 4]>) -> [i8; 4] {
             }
         }
 
-        action = translate_player_input(&input);
+        match translate_player_input(&input) {
+            Ok(act) => {action = act;}
+            Err(_) => {
+                println!("Invalid move. Try again:");
+                continue;
+            }
+        }
 
         if legal_moves.contains(&action) {
             break;
@@ -38,22 +44,51 @@ pub fn get_player_input(legal_moves: &HashSet<[i8; 4]>) -> [i8; 4] {
     return action;
 }
 
-pub fn translate_player_input(input: &String) -> [i8; 4] {
+pub fn translate_player_input(input: &String) -> Result<[i8; 4], ()> {
 
     // all actions are strings of the form 'x,y to x,y'
     let parts: Vec<&str> = input.split(" ").collect();
 
     // get the starting and ending coordinates from the action
+    // if parts vector isn't long enough, will be invalid move
+    if parts.len() != 3 {
+        return Err(());
+    }
     let start_pos: Vec<&str> = parts[0].split(",").collect();
     let end_pos: Vec<&str> = parts[2].split(",").collect();
 
-    let start_x = start_pos[0].parse::<i8>().expect("error converting coordinate to int");
-    let start_y = start_pos[1].parse::<i8>().expect("error converting coordinate to int");
 
-    let end_x = end_pos[0].parse::<i8>().expect("error converting coordinate to int");
-    let end_y = end_pos[1].parse::<i8>().expect("error converting coordinate to int");
 
-    return [start_x, start_y, end_x, end_y];
+    let start_x: i8;
+    let start_y: i8;
+    let end_x: i8;
+    let end_y: i8;
+
+
+    if start_pos.len() != 2 || end_pos.len() != 2 {
+        return Err(());
+    }
+
+    match start_pos[0].parse::<i8>() {
+        Ok(val) => { start_x = val; }
+        Err(_) => { return Err(()); }
+    }
+    match start_pos[1].parse::<i8>() {
+        Ok(val) => { start_y = val; }
+        Err(_) => { return Err(()); }
+    }
+
+    match end_pos[0].parse::<i8>() {
+        Ok(val) => { end_x = val; }
+        Err(_) => { return Err(()); }
+    }
+
+    match end_pos[1].parse::<i8>() {
+        Ok(val) => { end_y = val; }
+        Err(_) => {return Err(()); }
+    }
+
+    return Ok([start_x, start_y, end_x, end_y]);
 }
 
 pub fn player_turn(cur_state: &State) -> [i8; 4] {
