@@ -91,6 +91,8 @@ pub fn translate_player_input(input: &String) -> Result<[i8; 4], ()> {
     return Ok([start_x, start_y, end_x, end_y]);
 }
 
+
+
 pub fn player_turn(cur_state: &State) -> [i8; 4] {
     let legal_moves: HashSet<[i8; 4]> = generate_legal_moves(cur_state);
 
