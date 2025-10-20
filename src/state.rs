@@ -100,8 +100,8 @@ impl State {
         let mut minimax_val: i16 = 0;
         for (&_key, value) in &self.white {
             match value {
-                '♕' => { minimax_val += 100},
-                '♔' => { minimax_val += 20 },
+                '♕' => { minimax_val += 50},
+                '♔' => { minimax_val += 100 },
                 '♖' => { minimax_val += 15 },
                 '♗' => { minimax_val += 10 },
                 '♘' => { minimax_val += 7 },
@@ -111,8 +111,8 @@ impl State {
         }  
         for (&_key, value) in &self.black {
             match value {
-                '♛' => { minimax_val -= 100},
-                '♚' => { minimax_val -= 20 },
+                '♛' => { minimax_val -= 50},
+                '♚' => { minimax_val -= 100 },
                 '♜' => { minimax_val -= 15 },
                 '♝' => { minimax_val -= 10 },
                 '♞' => { minimax_val -= 7 },
@@ -157,9 +157,9 @@ impl State {
                     /* If a piece did exist at this spot, check if it was a king and set state's victory flag accordingly */
                     self.victory_flag = match x {
                         // white has taken out opposing king
-                        '♛' => 1,
+                        '♚' => 1,
                         // black has taken out opposing king
-                        '♕' => -1,
+                        '♔' => -1,
                         // neither has taken out a king, victory flag remains unset
                         _ => 0
                     }

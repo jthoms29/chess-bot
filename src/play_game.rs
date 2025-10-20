@@ -19,13 +19,13 @@ pub fn get_player_input(legal_moves: &HashSet<[i8; 4]>) -> [i8; 4] {
         let lower = input.to_lowercase();
         // make sure input move is valid
         if !re.is_match(&lower) {
-            println!("Invalid move. Try again regex.");
+            println!("Invalid command format. Should to of form 'xy to xy'");
             continue;
         }
 
         let action = translate_player_input(&lower);
         if !legal_moves.contains(&action) {
-            println!("Invalid move. Try again.");
+            println!("Illegal move. Try again.");
             continue;
         }
 
@@ -70,7 +70,7 @@ pub fn play_game() {
     /* temporary. Player is always white */
     let player = true;
 
-    loop {
+    while state.victory_check() == 0 {
         if player == state.is_white_turn() {
             println!("{}", state.to_string());
             let action = player_turn(&mut state);
@@ -80,5 +80,11 @@ pub fn play_game() {
             let action = comp_turn(&state);
             state.action_to_state(&action);
         }
+    }
+    if state.victory_check() == 1 {
+        println!("White wins.")
+    }
+    else {
+        println!("Black wins.")
     }
 }

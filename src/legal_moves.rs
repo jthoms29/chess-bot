@@ -253,7 +253,7 @@ Computes legal moves knight can take in this current state
 */
 pub fn knight_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>, legal_moves:&mut HashSet<[i8; 4]>) {
 
-    // the night has 8 different possible landing points. This match looks confusing
+    // the knight has 8 different possible landing points. This match looks confusing
     // but trust me it gets them all. Combination of two spaces then one
 
     for i in 0..8 {
