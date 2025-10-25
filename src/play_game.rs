@@ -1,11 +1,10 @@
 
-use std::io;
 use text_io;
 use regex::Regex;
 use std::collections::HashSet;
 use crate::state;
 use crate::minimax;
-
+use std::{thread, time, io::Write};
 /*
  * Get an input from the player. This function ensures that the move the user gives as input is legal
  */
@@ -67,8 +66,26 @@ pub fn comp_turn(cur_state: &state::State) -> [i8; 4] {
 pub fn play_game() {
     /* Create the initial state */
     let mut state = state::State::new();
-    /* temporary. Player is always white */
-    let player = true;
+
+
+    let player: bool;
+
+    loop {
+        print!("White or black?: ");
+        let mut input: String  = text_io::read!("{}\n");
+        input = input.to_lowercase();
+
+        if input == "white" {
+            player = true;
+            break;
+        }
+
+        else if input == "black" {
+            player = false;
+            break;
+        }
+        println!("Invalid input.")
+    }
 
     while state.victory_check() == 0 {
         if player == state.is_white_turn() {
@@ -77,7 +94,24 @@ pub fn play_game() {
             state.action_to_state(&action);
         }
         else {
-            let action = comp_turn(&state);
+            // need to give searcher thread own copy
+            let clone = state.copy_state();
+            let search_thread = thread::spawn(move || {
+                comp_turn(&clone)
+            });
+
+            while !search_thread.is_finished() {
+                let animation = ['|', '/', '-', '\\'];
+                for bar in animation {
+                    print!("\rThinking {bar}");
+                    thread::sleep(time::Duration::from_millis(500));
+                    std::io::stdout().flush();
+
+                }
+            }
+            println!("");
+            let action = search_thread.join().unwrap();
+
             state.action_to_state(&action);
         }
     }

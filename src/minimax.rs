@@ -24,6 +24,7 @@ pub fn search_max(cur_state: &State, depth_limit: u16) -> [i8; 4] {
             best_action = action.clone();
         } 
     }
+    println!("Estimated minimax value: {best}");
     return best_action;
 }
 
@@ -48,8 +49,7 @@ pub fn search_min(cur_state: &State, depth_limit: u16) -> [i8; 4] {
             best_action = action.clone();
         } 
     }
-    //println!("got an action");
-    //println!("{best_action}");
+    println!("Estimated minimax value: {best}");
     return best_action;
 }
 

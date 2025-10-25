@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 regex = "1.12.2"
 text_io = "0.1.13"
+thread = "0.0.1"
