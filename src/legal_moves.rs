@@ -190,7 +190,7 @@ pub fn queen_legal_moves(loc_x:i8, loc_y:i8, cur_player:&HashMap<(i8, i8), char>
             if in_bound(new_x, new_y) &&
             !cur_player.contains_key(&(new_x, new_y)) {
                 //legal_moves.insert(format!("{loc_x},{loc_y} to {new_x},{new_y}"));
-                legal_moves.insert([loc_x, loc_y, new_y, new_y]);
+                legal_moves.insert([loc_x, loc_y, new_x, new_y]);
                 // if an opposing player's piece is on this coordinate, we must stop here
                 if opp_player.contains_key(&(new_x, new_y)) { break; }
             }

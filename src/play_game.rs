@@ -24,6 +24,10 @@ pub fn get_player_input(legal_moves: &HashSet<[i8; 4]>) -> [i8; 4] {
 
         let action = translate_player_input(&lower);
         if !legal_moves.contains(&action) {
+            for &m in legal_moves.iter() {
+                println!("{:?}", m);
+            }
+
             println!("Illegal move. Try again.");
             continue;
         }
@@ -47,6 +51,7 @@ pub fn translate_player_input(input: &String) -> [i8; 4] {
     action[2] = (parts[6] as i8) - 97;
     action[3] = (8 - (parts[7] as i8 - 48)).abs();
 
+    println!("{:?}", action);
 
     return action;
 }
