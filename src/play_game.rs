@@ -2,6 +2,7 @@
 use text_io;
 use regex::Regex;
 use std::collections::HashSet;
+use crate::minimax::MinimaxResult;
 use crate::state;
 use crate::minimax;
 use std::{thread, time, io::Write};
@@ -24,10 +25,6 @@ pub fn get_player_input(legal_moves: &HashSet<[i8; 4]>) -> [i8; 4] {
 
         let action = translate_player_input(&lower);
         if !legal_moves.contains(&action) {
-            for &m in legal_moves.iter() {
-                println!("{:?}", m);
-            }
-
             println!("Illegal move. Try again.");
             continue;
         }
@@ -51,7 +48,6 @@ pub fn translate_player_input(input: &String) -> [i8; 4] {
     action[2] = (parts[6] as i8) - 97;
     action[3] = (8 - (parts[7] as i8 - 48)).abs();
 
-    println!("{:?}", action);
 
     return action;
 }
@@ -64,7 +60,7 @@ pub fn player_turn(cur_state: &state::State) -> [i8; 4] {
     return get_player_input(&legal_moves);
 }
 
-pub fn comp_turn(cur_state: &state::State) -> [i8; 4] {
+pub fn comp_turn(cur_state: &state::State) -> MinimaxResult {
     return minimax::search_min(&cur_state, 5);
 }
 
@@ -97,6 +93,7 @@ pub fn play_game() {
             println!("{}", state.to_string());
             let action = player_turn(&mut state);
             state.action_to_state(&action);
+            println!("{}", state.to_string());
         }
         else {
             // need to give searcher thread own copy
@@ -104,20 +101,19 @@ pub fn play_game() {
             let search_thread = thread::spawn(move || {
                 comp_turn(&clone)
             });
-
             while !search_thread.is_finished() {
                 let animation = ['|', '/', '-', '\\'];
                 for bar in animation {
                     print!("\rThinking {bar}");
                     thread::sleep(time::Duration::from_millis(500));
                     std::io::stdout().flush();
-
                 }
             }
-            println!("");
-            let action = search_thread.join().unwrap();
+            std::io::stdout().flush();
+            let result = search_thread.join().unwrap();
 
-            state.action_to_state(&action);
+            println!("\rMinimax value: {}", result.minimax_val);
+            state.action_to_state(&result.action);
         }
     }
     if state.victory_check() == 1 {

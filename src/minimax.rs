@@ -1,11 +1,14 @@
 use std::collections::HashSet;
 use crate::state::{State};
 
-
-
+#[derive(Default)]
+pub struct MinimaxResult {
+    pub minimax_val: i16,
+    pub action: [i8; 4],
+}
 
 /* Returns the best move that can be taken given a state and depth-limit */
-pub fn search_max(cur_state: &State, depth_limit: u16) -> [i8; 4] {
+pub fn search_max(cur_state: &State, depth_limit: u16) -> MinimaxResult {
     let mut best_action: [i8; 4] = [0; 4];
     let alpha: i16 = i16::MIN;
     let beta:i16 = i16::MAX;
@@ -24,13 +27,13 @@ pub fn search_max(cur_state: &State, depth_limit: u16) -> [i8; 4] {
             best_action = action.clone();
         } 
     }
-    println!("Estimated minimax value: {best}");
-    return best_action;
+    let res = MinimaxResult{minimax_val: best, action: best_action};
+    return res;
 }
 
 
 /* Returns the best move that can be taken given a state and depth-limit */
-pub fn search_min(cur_state: &State, depth_limit: u16) -> [i8; 4] {
+pub fn search_min(cur_state: &State, depth_limit: u16) -> MinimaxResult {
     let mut best_action: [i8; 4] = [0; 4];
     let alpha: i16 = i16::MIN;
     let beta:i16 = i16::MAX;
@@ -49,8 +52,8 @@ pub fn search_min(cur_state: &State, depth_limit: u16) -> [i8; 4] {
             best_action = action.clone();
         } 
     }
-    println!("Estimated minimax value: {best}");
-    return best_action;
+    let res = MinimaxResult{minimax_val: best, action: best_action};
+    return res;
 }
 
 
