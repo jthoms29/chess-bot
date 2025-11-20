@@ -61,7 +61,10 @@ pub fn player_turn(cur_state: &state::State) -> [i8; 4] {
 }
 
 pub fn comp_turn(cur_state: &state::State) -> MinimaxResult {
-    return minimax::search_min(&cur_state, 5);
+    match cur_state.is_white_turn() {
+        false => minimax::search_min(&cur_state, 5),
+        true => minimax::search_max(&cur_state, 5)
+    }
 }
 
 pub fn play_game() {
@@ -111,6 +114,7 @@ pub fn play_game() {
             }
             std::io::stdout().flush();
             let result = search_thread.join().unwrap();
+
 
             println!("\rMinimax value: {}", result.minimax_val);
             state.action_to_state(&result.action);
