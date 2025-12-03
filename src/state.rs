@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use crate::legal_moves;
 
 #[derive(Default)]
+#[derive(Eq, Hash, PartialEq)]
 pub struct State {
     // Dict mapping white piece location to piece
     white: HashMap<(i8, i8), char>,

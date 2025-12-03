@@ -108,7 +108,7 @@ pub fn play_game() {
                 let animation = ['|', '/', '-', '\\'];
                 for bar in animation {
                     print!("\rThinking {bar}");
-                    thread::sleep(time::Duration::from_millis(500));
+                    thread::sleep(time::Duration::from_millis(250));
                     std::io::stdout().flush();
                 }
             }
