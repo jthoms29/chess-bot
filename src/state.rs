@@ -17,6 +17,10 @@ pub struct State {
 
 impl State {
 
+    pub fn Hash(&self) -> u16 {
+        
+    }
+
     /*
     Generate a string representation of the current state
     */

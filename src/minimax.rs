@@ -45,7 +45,7 @@ pub fn search_min(cur_state: &State, depth_limit: u16, transposition_table: &Has
     let beta:i16 = i16::MAX;
     let mut best: i16 = i16::MAX;
 
-    let mut transposition_table: HashMap<&State, i16> = Default::default();
+    let transposition_table: HashMap<&State, i16> = Default::default();
     
     let mut cur_val: i16;
 
@@ -53,7 +53,7 @@ pub fn search_min(cur_state: &State, depth_limit: u16, transposition_table: &Has
     for action in &legal_moves {
         let mut new_state = cur_state.copy_state();
         new_state.action_to_state(&action);
-        cur_val = max_recurse(&new_state, alpha, beta, depth_limit-1, &mut transposition_table);
+        cur_val = max_recurse(&new_state, alpha, beta, depth_limit-1, &transposition_table);
 
         if cur_val < best {
             best = cur_val;
@@ -65,7 +65,7 @@ pub fn search_min(cur_state: &State, depth_limit: u16, transposition_table: &Has
 }
 
 
-fn max_recurse<'a>(cur_state: &'a State, mut alpha: i16, beta: i16, depth_limit: u16, transposition_table: &mut HashMap<&'a State, i16>) -> i16 {
+fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16, transposition_table: &HashMap<&State, i16>) -> i16 {
     if cur_state.victory_check() == -1 {
         return -1000;
     }
@@ -106,7 +106,7 @@ fn max_recurse<'a>(cur_state: &'a State, mut alpha: i16, beta: i16, depth_limit:
 }
 
 
-fn min_recurse<'a>(cur_state: &'a State, alpha: i16, mut beta: i16, depth_limit: u16, transposition_table: &mut HashMap<&'a State, i16>) -> i16 {
+fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16, transposition_table: &mut HashMap<&State, i16>) -> i16 {
     if cur_state.victory_check() == -1 {
         return -1000;
     }
