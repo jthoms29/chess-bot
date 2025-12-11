@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
 use crate::legal_moves;
 
 #[derive(Default)]
-#[derive(Eq, Hash, PartialEq)]
 pub struct State {
     // Dict mapping white piece location to piece
     white: HashMap<(i8, i8), char>,
@@ -17,9 +17,6 @@ pub struct State {
 
 impl State {
 
-    pub fn Hash(&self) -> u16 {
-        
-    }
 
     /*
     Generate a string representation of the current state
@@ -181,7 +178,7 @@ impl State {
     /*
     Creates a copy of this state
     */
-    pub fn copy_state(&self) -> State {
+    pub fn clone(&self) -> Self {
         let mut new_state: State = State::new();
         new_state.white = self.white.clone();
         new_state.black = self.black.clone();
@@ -245,7 +242,41 @@ impl State {
 
 }
 
+impl Clone for State {
+    fn clone(&self) -> Self {
+        let mut new_state: State = State::new();
+        new_state.white = self.white.clone();
+        new_state.black = self.black.clone();
+        new_state.victory_flag = self.victory_flag;
+        new_state.white_turn = self.white_turn;
 
+        return new_state;
+    }
+}
 
+impl Hash for State {
+    fn hash<H: Hasher>(&self, s: &mut H) {
+        let mut items1: Vec<_> = self.white.iter().collect();
+        items1.sort_by_key(|(k,_)| **k);
+        for (k,v) in items1 {
+            k.hash(s);
+            v.hash(s);
+        }
+
+        let mut items2: Vec<_> = self.black.iter().collect();
+        items2.sort_by_key(|(k,_)| **k);
+        for (k,v) in items2 {
+            k.hash(s);
+            v.hash(s);
+        }
+    }
+}
+
+impl PartialEq for State {
+    fn eq(&self, other: &Self) -> bool {
+        self.white == other.white && self.black == other.black
+    }
+}
+impl Eq for State {}
 
 

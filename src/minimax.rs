@@ -17,16 +17,16 @@ pub fn search_max(cur_state: &State, depth_limit: u16) -> MinimaxResult {
     let mut best: i16 = i16::MIN;
 
 
-    let transposition_table: HashMap<&State, i16> = Default::default();
+    let mut transposition_table: HashMap<State, i16> = Default::default();
 
 
     let mut cur_val: i16;
 
     let legal_moves: HashSet<[i8; 4]> = cur_state.generate_legal_moves();
     for action in &legal_moves {
-        let mut new_state = cur_state.copy_state();
+        let mut new_state = cur_state.clone();
         new_state.action_to_state(&action);
-        cur_val = min_recurse(&new_state, alpha, beta, depth_limit-1, &transposition_table);
+        cur_val = min_recurse(&new_state, alpha, beta, depth_limit-1, &mut transposition_table);
 
         if cur_val > best {
             best = cur_val;
@@ -39,21 +39,21 @@ pub fn search_max(cur_state: &State, depth_limit: u16) -> MinimaxResult {
 
 
 /* Returns the best move that can be taken given a state and depth-limit */
-pub fn search_min(cur_state: &State, depth_limit: u16, transposition_table: &HashMap<&State, i16>) -> MinimaxResult {
+pub fn search_min(cur_state: &State, depth_limit: u16) -> MinimaxResult {
     let mut best_action: [i8; 4] = [0; 4];
     let alpha: i16 = i16::MIN;
     let beta:i16 = i16::MAX;
     let mut best: i16 = i16::MAX;
 
-    let transposition_table: HashMap<&State, i16> = Default::default();
+    let mut transposition_table: HashMap<State, i16> = Default::default();
     
     let mut cur_val: i16;
 
     let legal_moves: HashSet<[i8; 4]> = cur_state.generate_legal_moves();
     for action in &legal_moves {
-        let mut new_state = cur_state.copy_state();
+        let mut new_state = cur_state.clone();
         new_state.action_to_state(&action);
-        cur_val = max_recurse(&new_state, alpha, beta, depth_limit-1, &transposition_table);
+        cur_val = max_recurse(&new_state, alpha, beta, depth_limit-1, &mut transposition_table);
 
         if cur_val < best {
             best = cur_val;
@@ -65,7 +65,7 @@ pub fn search_min(cur_state: &State, depth_limit: u16, transposition_table: &Has
 }
 
 
-fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16, transposition_table: &HashMap<&State, i16>) -> i16 {
+fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16, transposition_table: &mut HashMap<State, i16>) -> i16 {
     if cur_state.victory_check() == -1 {
         return -1000;
     }
@@ -79,8 +79,8 @@ fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16, t
 
     // this state has already been reached, can just return previously computed
     // minimax value
-    if transposition_table.contains_key(&cur_state) {
-        return *transposition_table.get(&cur_state).unwrap();
+    if transposition_table.contains_key(cur_state) {
+        return *transposition_table.get(cur_state).unwrap();
     }
 
     let mut cur_val: i16;
@@ -88,7 +88,7 @@ fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16, t
 
     let legal_moves: HashSet<[i8; 4]> = cur_state.generate_legal_moves();
     for action in &legal_moves {
-        let mut new_state = cur_state.copy_state();
+        let mut new_state = cur_state.clone();
         new_state.action_to_state(&action);
         cur_val = min_recurse(&new_state, alpha, beta, depth_limit-1, transposition_table);
 
@@ -101,12 +101,12 @@ fn max_recurse(cur_state: &State, mut alpha: i16, beta: i16, depth_limit: u16, t
         }
         alpha = std::cmp::max(alpha, best);
     }
-    transposition_table.insert(&cur_state, best);
+    transposition_table.insert(cur_state.clone(), best);
     return best;
 }
 
 
-fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16, transposition_table: &mut HashMap<&State, i16>) -> i16 {
+fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16, transposition_table: &mut HashMap<State, i16>) -> i16 {
     if cur_state.victory_check() == -1 {
         return -1000;
     }
@@ -130,7 +130,7 @@ fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16, t
     let legal_moves: HashSet<[i8; 4]> = cur_state.generate_legal_moves();
 
     for action in &legal_moves {
-        let mut new_state = cur_state.copy_state();
+        let mut new_state = cur_state.clone();
         new_state.action_to_state(&action);
         cur_val = max_recurse(&new_state, alpha, beta, depth_limit-1, transposition_table);
 
@@ -144,7 +144,7 @@ fn min_recurse(cur_state: &State, alpha: i16, mut beta: i16, depth_limit: u16, t
         }
         beta = std::cmp::min(best, beta);
     }
-    transposition_table.insert(&cur_state, best);
+    transposition_table.insert(cur_state.clone(), best);
     return best;
 }
 

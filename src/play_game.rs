@@ -100,7 +100,7 @@ pub fn play_game() {
         }
         else {
             // need to give searcher thread own copy
-            let clone = state.copy_state();
+            let clone = state.clone();
             let search_thread = thread::spawn(move || {
                 comp_turn(&clone)
             });
